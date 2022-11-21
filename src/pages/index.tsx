@@ -1,6 +1,5 @@
 import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
+import { WalletConnect } from "../component/WalletConnect";
 
 export default function Home() {
   return (
@@ -15,23 +14,7 @@ export default function Home() {
           <h1 className="text-transparent font-extrabold text-2xl bg-clip-text bg-gradient-to-r from-[#4158D0] via-[#C850C0] to-[#FFCC70]">
             Kyutech hackathon
           </h1>
-          <div className="flex items-center">
-            <a
-              href="https://github.com/kyutech-hackathon-b/scroll-game-client"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image
-                alt="githubのロゴ"
-                src="/logo-github.png"
-                width={25}
-                height={25}
-              />
-            </a>
-            <button className="leading-none cursor-pointer font-bold text-white bg-black p-4 ml-8 rounded-md">
-              Connect wallet
-            </button>
-          </div>
+          <WalletConnect />
         </div>
       </header>
       <main className="w-full max-w-6xl mx-auto flex mt-20">
