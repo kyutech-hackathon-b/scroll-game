@@ -1,7 +1,13 @@
 import Head from "next/head";
+import { useCallback } from "react";
 import { WalletConnect } from "../component/WalletConnect";
+import { useMintNFT } from "../hook/MintNFT";
 
 export default function Home() {
+  const { send } = useMintNFT();
+  const handleSubmit = async () => {
+    await send("3rd", "10,000", "2022/11/21");
+  };
   return (
     <div>
       <Head>
@@ -28,6 +34,12 @@ export default function Home() {
             <li>2位 test</li>
             <li>3位 test</li>
           </ul>
+          <button
+            className="block mt-3 mx-auto text-sm leading-none cursor-pointer font-bold text-white bg-black py-4 px-5 rounded-md"
+            onClick={handleSubmit}
+          >
+            Mint NFT
+          </button>
         </div>
       </main>
     </div>
