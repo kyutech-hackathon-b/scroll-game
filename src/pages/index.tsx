@@ -7,17 +7,19 @@ import { useMintNFT } from "../hook/MintNFT";
 
 export default function Home() {
   const { send } = useMintNFT();
-  const { unityProvider, isLoaded } = useUnityContext({
-    loaderUrl: "/Build/kyutechHack.loader.js",
-    dataUrl: "/Build/kyutechHack.data",
-    frameworkUrl: "/Build/kyutechHack.framework.js",
-    codeUrl: "/Build/kyutechHack.wasm",
-    webglContextAttributes: {
-      preserveDrawingBuffer: true,
-    },
-  });
+  const [score, setScore] = useState<number>(0);
+  const { unityProvider, isLoaded, addEventListener, removeEventListener } =
+    useUnityContext({
+      loaderUrl: "/Build/kyutechHack.loader.js",
+      dataUrl: "/Build/kyutechHack.data",
+      frameworkUrl: "/Build/kyutechHack.framework.js",
+      codeUrl: "/Build/kyutechHack.wasm",
+      webglContextAttributes: {
+        preserveDrawingBuffer: true,
+      },
+    });
   const [devicePixelRatio, setDevicePixelRatio] = useState(0);
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -27,6 +29,16 @@ export default function Home() {
   const handleSubmit = async () => {
     await send("3rd", "10,000", "2022/11/21");
   };
+  const handleGameOver = useCallback((score: number) => {
+    setScore(score);
+    setOpen(true);
+  }, []);
+  useEffect(() => {
+    addEventListener("Die", handleGameOver);
+    return () => {
+      removeEventListener("GameOver", handleGameOver);
+    };
+  }, [handleGameOver, addEventListener, removeEventListener]);
   return (
     <div>
       <Head>
@@ -42,7 +54,7 @@ export default function Home() {
           <WalletConnect />
         </div>
       </header>
-      <main className="w-full">
+      <main className="w-full relative">
         {isLoaded === false && (
           <div className="h-[calc(100vh-70px)] w-full relative bg-black">
             <div className="spinner-box">
@@ -73,6 +85,12 @@ export default function Home() {
         >
           {/* Modal content */}
         </Modal>
+        <button
+          className="w-20 h-20 rounded-full bg-black absolute right-4 bottom-4"
+          onClick={() => setOpen(true)}
+        >
+          色変更
+        </button>
       </main>
     </div>
   );
