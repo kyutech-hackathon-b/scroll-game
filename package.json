@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typechain:generate": "yarn typechain --target=ethers-v5 ./contract/KyutechNFT.json --out-dir=./contract"
+    "typechain:generate": "yarn typechain --target=ethers-v5 ./contract/RewardNFT.json --out-dir=./contract"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
