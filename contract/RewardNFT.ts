@@ -27,13 +27,13 @@ import type {
   PromiseOrValue,
 } from "./common";
 
-export interface KyutechNFTInterface extends utils.Interface {
+export interface RewardNFTInterface extends utils.Interface {
   functions: {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "makeRankNFT(string,string,string)": FunctionFragment;
+    "makeColorNFT(string,string)": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -51,7 +51,7 @@ export interface KyutechNFTInterface extends utils.Interface {
       | "balanceOf"
       | "getApproved"
       | "isApprovedForAll"
-      | "makeRankNFT"
+      | "makeColorNFT"
       | "name"
       | "ownerOf"
       | "safeTransferFrom(address,address,uint256)"
@@ -80,12 +80,8 @@ export interface KyutechNFTInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "makeRankNFT",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>
-    ]
+    functionFragment: "makeColorNFT",
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -142,7 +138,7 @@ export interface KyutechNFTInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "makeRankNFT",
+    functionFragment: "makeColorNFT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
@@ -231,12 +227,12 @@ export type TransferEvent = TypedEvent<
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
-export interface KyutechNFT extends BaseContract {
+export interface RewardNFT extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: KyutechNFTInterface;
+  interface: RewardNFTInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -280,10 +276,9 @@ export interface KyutechNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    makeRankNFT(
-      rank: PromiseOrValue<string>,
+    makeColorNFT(
       name: PromiseOrValue<string>,
-      date: PromiseOrValue<string>,
+      rgb16: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -357,10 +352,9 @@ export interface KyutechNFT extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  makeRankNFT(
-    rank: PromiseOrValue<string>,
+  makeColorNFT(
     name: PromiseOrValue<string>,
-    date: PromiseOrValue<string>,
+    rgb16: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -434,10 +428,9 @@ export interface KyutechNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    makeRankNFT(
-      rank: PromiseOrValue<string>,
+    makeColorNFT(
       name: PromiseOrValue<string>,
-      date: PromiseOrValue<string>,
+      rgb16: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -556,10 +549,9 @@ export interface KyutechNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    makeRankNFT(
-      rank: PromiseOrValue<string>,
+    makeColorNFT(
       name: PromiseOrValue<string>,
-      date: PromiseOrValue<string>,
+      rgb16: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -634,10 +626,9 @@ export interface KyutechNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    makeRankNFT(
-      rank: PromiseOrValue<string>,
+    makeColorNFT(
       name: PromiseOrValue<string>,
-      date: PromiseOrValue<string>,
+      rgb16: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
