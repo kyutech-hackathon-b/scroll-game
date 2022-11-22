@@ -1,10 +1,52 @@
+import { Modal } from "@mantine/core";
 import Head from "next/head";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Unity, useUnityContext } from "react-unity-webgl";
 import { WalletConnect } from "../component/WalletConnect";
 import { useMintNFT } from "../hook/MintNFT";
 
 export default function Home() {
   const { send } = useMintNFT();
+  const { unityProvider, isLoaded } = useUnityContext({
+    loaderUrl: "/Build/kyutechHack.loader.js",
+    dataUrl: "/Build/kyutechHack.data",
+    frameworkUrl: "/Build/kyutechHack.framework.js",
+    codeUrl: "/Build/kyutechHack.wasm",
+    webglContextAttributes: {
+      preserveDrawingBuffer: true,
+    },
+  });
+  const [devicePixelRatio, setDevicePixelRatio] = useState(0);
+  const [open, setOpen] = useState<boolean>(true);
+
+  const handleChangePixelRatio = useCallback(
+    function () {
+      // A function which will update the device pixel ratio of the Unity
+      // Application to match the device pixel ratio of the browser.
+      const updateDevicePixelRatio = function () {
+        setDevicePixelRatio(window.devicePixelRatio);
+      };
+      // A media matcher which watches for changes in the device pixel ratio.
+      const mediaMatcher = window.matchMedia(
+        `screen and (resolution: ${devicePixelRatio}dppx)`
+      );
+      // Adding an event listener to the media matcher which will update the
+      // device pixel ratio of the Unity Application when the device pixel
+      // ratio changes.
+      mediaMatcher.addEventListener("change", updateDevicePixelRatio);
+      return function () {
+        // Removing the event listener when the component unmounts.
+        mediaMatcher.removeEventListener("change", updateDevicePixelRatio);
+      };
+    },
+    [devicePixelRatio]
+  );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setDevicePixelRatio(window.devicePixelRatio);
+    }
+  }, []);
   const handleSubmit = async () => {
     await send("3rd", "10,000", "2022/11/21");
   };
@@ -23,24 +65,37 @@ export default function Home() {
           <WalletConnect />
         </div>
       </header>
-      <main className="w-full max-w-6xl mx-auto flex mt-20">
-        <div className="w-[75%]">
-          <div className="w-full h-[600px] bg-black"></div>
-        </div>
-        <div className="w-[25%] px-3">
-          <h2 className="text-xl font-bold text-center">Ranking</h2>
-          <ul>
-            <li>1位 test</li>
-            <li>2位 test</li>
-            <li>3位 test</li>
-          </ul>
-          <button
-            className="block mt-3 mx-auto text-sm leading-none cursor-pointer font-bold text-white bg-black py-4 px-5 rounded-md"
-            onClick={handleSubmit}
-          >
-            Mint NFT
-          </button>
-        </div>
+      <main className="w-full">
+        {isLoaded === false && (
+          <div className="h-[calc(100vh-70px)] w-full relative bg-black">
+            <div className="spinner-box">
+              <div className="blue-orbit leo"></div>
+
+              <div className="green-orbit leo"></div>
+
+              <div className="red-orbit leo"></div>
+
+              <div className="white-orbit w1 leo"></div>
+              <div className="white-orbit w2 leo"></div>
+              <div className="white-orbit w3 leo"></div>
+            </div>
+          </div>
+        )}
+        <Unity
+          unityProvider={unityProvider}
+          style={{
+            height: "calc(100vh - 70px)",
+            width: "100%",
+          }}
+          devicePixelRatio={devicePixelRatio}
+        />
+        <Modal
+          opened={open}
+          onClose={() => setOpen(false)}
+          title="Introduce yourself!"
+        >
+          {/* Modal content */}
+        </Modal>
       </main>
     </div>
   );
