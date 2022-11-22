@@ -1,10 +1,10 @@
 import { Contract, utils } from "ethers";
-import GourmetAbi from "../../contract/KyutechNFT.json";
-import { KyutechNFT } from "../../contract";
+import RewardNFTAbi from "../../contract/RewardNFT.json";
+import { RewardNFT } from "../../contract";
 
-const contractAddress = "0xaD40c0b0B2Ac4dfcA2de8e15Db077f2bC80d7C7a";
-const kyutechNFTInterface = new utils.Interface(GourmetAbi.abi);
+const contractAddress = "0x1B815CFc267A6B7f91F2f8EdEC98C00547fa71df";
+const RewardNFTInterface = new utils.Interface(RewardNFTAbi.abi);
 export const contract = new Contract(
   contractAddress,
-  kyutechNFTInterface
-) as KyutechNFT;
+  RewardNFTInterface
+) as RewardNFT;
