@@ -8,16 +8,21 @@ import { useMintNFT } from "../hook/MintNFT";
 export default function Home() {
   const { send } = useMintNFT();
   const [score, setScore] = useState<number>(0);
-  const { unityProvider, isLoaded, addEventListener, removeEventListener } =
-    useUnityContext({
-      loaderUrl: "/Build/kyutechHack.loader.js",
-      dataUrl: "/Build/kyutechHack.data",
-      frameworkUrl: "/Build/kyutechHack.framework.js",
-      codeUrl: "/Build/kyutechHack.wasm",
-      webglContextAttributes: {
-        preserveDrawingBuffer: true,
-      },
-    });
+  const {
+    unityProvider,
+    isLoaded,
+    addEventListener,
+    removeEventListener,
+    sendMessage,
+  } = useUnityContext({
+    loaderUrl: "/Build/kyutechHack.loader.js",
+    dataUrl: "/Build/kyutechHack.data",
+    frameworkUrl: "/Build/kyutechHack.framework.js",
+    codeUrl: "/Build/kyutechHack.wasm",
+    webglContextAttributes: {
+      preserveDrawingBuffer: true,
+    },
+  });
   const [devicePixelRatio, setDevicePixelRatio] = useState(0);
   const [open, setOpen] = useState<boolean>(false);
 
@@ -29,14 +34,17 @@ export default function Home() {
   const handleSubmit = async () => {
     await send("3rd", "10,000", "2022/11/21");
   };
+  const handleColor = useCallback((rgb: string) => {
+    sendMessage("Color", "ChangeColor", rgb);
+  }, []);
   const handleGameOver = useCallback((score: number) => {
     setScore(score);
     setOpen(true);
   }, []);
   useEffect(() => {
-    addEventListener("Die", handleGameOver);
+    addEventListener("Score", handleGameOver);
     return () => {
-      removeEventListener("GameOver", handleGameOver);
+      removeEventListener("Score", handleGameOver);
     };
   }, [handleGameOver, addEventListener, removeEventListener]);
   return (
@@ -51,6 +59,7 @@ export default function Home() {
           <h1 className="text-transparent font-extrabold text-2xl bg-clip-text bg-gradient-to-r from-[#4158D0] via-[#C850C0] to-[#FFCC70]">
             Many drops make a shower
           </h1>
+          <button onClick={() => handleColor("#000000")}>Color</button>
           <WalletConnect />
         </div>
       </header>
@@ -83,7 +92,7 @@ export default function Home() {
           onClose={() => setOpen(false)}
           title="Introduce yourself!"
         >
-          {/* Modal content */}
+          <p className="text-3xl font-bold text-center ">{score}</p>
         </Modal>
         <button
           className="w-20 h-20 rounded-full bg-black absolute right-4 bottom-4"
