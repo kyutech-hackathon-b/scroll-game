@@ -1,14 +1,18 @@
 import { Modal } from "@mantine/core";
+import { onAuthStateChanged, User } from "firebase/auth";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import useSWR from "swr";
 import { WalletConnect } from "../component/WalletConnect";
+import { firebaseAuth } from "../Firebase/firebase";
 import { useColor } from "../hook/Color";
+import { useMintNFT } from "../hook/MintNFT";
 import { useOwnerOf } from "../hook/OwnerOf";
 import { fetcher } from "../utils/fetcher";
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>();
   const [score, setScore] = useState<number>(0);
   const {
     unityProvider,
@@ -33,11 +37,6 @@ export default function Home() {
   const { owner } = useOwnerOf();
   const { data, error } = useSWR(url, fetcher);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setDevicePixelRatio(window.devicePixelRatio);
-    }
-  }, []);
   const handleColor = useCallback(
     (rgb: string) => {
       sendMessage("Player", "ChangeColor", rgb);
@@ -58,6 +57,19 @@ export default function Home() {
     setScore(score);
     setScoreOpen(true);
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setDevicePixelRatio(window.devicePixelRatio);
+    }
+  }, []);
+  /* ↓ログインしているかどうかを判定する */
+  useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (currentUser: any) => {
+      setUser(currentUser);
+    });
+  }, []);
+
   useEffect(() => {
     addEventListener("Score", handleGameOver);
     return () => {
@@ -101,6 +113,7 @@ export default function Home() {
               </svg>
             </button>
           </div>
+          <div>{user ? user.displayName : ""}</div>
         </div>
       </header>
       <main className="w-full relative">
