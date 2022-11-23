@@ -4,6 +4,7 @@ import { Goerli, useEthers } from "@usedapp/core";
 export const WalletConnect = () => {
   const { account, chainId, deactivate, activateBrowserWallet, switchNetwork } =
     useEthers();
+
   if (account) {
     if (chainId === Goerli.chainId) {
       return (
