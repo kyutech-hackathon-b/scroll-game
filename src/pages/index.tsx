@@ -69,7 +69,13 @@ export default function Home() {
           isLoaded={isLoaded}
           sendMessage={sendMessage}
         />
-        <ScoreModal open={scoreOpen} setOpen={setScoreOpen} score={score} />
+        <ScoreModal
+          open={scoreOpen}
+          setOpen={setScoreOpen}
+          score={score}
+          sendMessage={sendMessage}
+          isLoaded={isLoaded}
+        />
       </main>
     </div>
   );
