@@ -2,7 +2,7 @@ import { useContractFunction } from "@usedapp/core";
 import { contract } from "..";
 
 export const useMintNFT = () => {
-  const { state, send } = useContractFunction(contract, "makeRankNFT", {
+  const { state, send } = useContractFunction(contract, "makeColorNFT", {
     transactionName: "Add",
   });
   const loading =
