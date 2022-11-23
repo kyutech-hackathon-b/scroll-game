@@ -32,7 +32,7 @@ export const ColorModal: FC<Props> = (props) => {
   );
   const handleUndo = useCallback(
     (rgb: string) => {
-      sendMessage("Color", "ChangeColor", rgb);
+      sendMessage("Player", "ChangeColor", rgb);
       setChanged(false);
       setOpen(false);
     },
