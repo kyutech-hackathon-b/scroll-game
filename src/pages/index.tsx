@@ -28,6 +28,7 @@ export default function Home() {
   const [devicePixelRatio, setDevicePixelRatio] = useState(0);
   const [colorOpen, setColorOpen] = useState<boolean>(false);
   const [scoreOpen, setScoreOpen] = useState<boolean>(false);
+  const [changed, setChanged] = useState<boolean>(false);
   const { url } = useColor();
   const { owner } = useOwnerOf();
   const { data, error } = useSWR(url, fetcher);
@@ -37,9 +38,22 @@ export default function Home() {
       setDevicePixelRatio(window.devicePixelRatio);
     }
   }, []);
-  const handleColor = useCallback((rgb: string) => {
-    sendMessage("Color", "ChangeColor", rgb);
-  }, []);
+  const handleColor = useCallback(
+    (rgb: string) => {
+      sendMessage("Player", "ChangeColor", rgb);
+      setChanged(true);
+      setColorOpen(false);
+    },
+    [isLoaded]
+  );
+  const handleUndo = useCallback(
+    (rgb: string) => {
+      sendMessage("Color", "ChangeColor", rgb);
+      setChanged(false);
+      setColorOpen(false);
+    },
+    [isLoaded]
+  );
   const handleGameOver = useCallback((score: number) => {
     setScore(score);
     setScoreOpen(true);
@@ -129,9 +143,21 @@ export default function Home() {
                 >
                   {data?.name}
                 </span>
-                <button className="text-sm leading-none cursor-pointer font-bold text-white bg-black py-4 px-5 ml-10 rounded-md">
-                  選択
-                </button>
+                {changed ? (
+                  <button
+                    className="text-sm leading-none cursor-pointer font-bold text-white bg-black py-4 px-5 ml-10 rounded-md"
+                    onClick={() => handleUndo("#2ee3fd")}
+                  >
+                    戻す
+                  </button>
+                ) : (
+                  <button
+                    className="text-sm leading-none cursor-pointer font-bold text-white bg-black py-4 px-5 ml-10 rounded-md"
+                    onClick={() => handleColor(data.name)}
+                  >
+                    選択
+                  </button>
+                )}
               </li>
             ) : (
               <li>NFTを所持していません</li>
