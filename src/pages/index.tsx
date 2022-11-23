@@ -2,11 +2,13 @@ import { Modal } from "@mantine/core";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
+import useSWR from "swr";
 import { WalletConnect } from "../component/WalletConnect";
-import { useMintNFT } from "../hook/MintNFT";
+import { useColor } from "../hook/Color";
+import { useOwnerOf } from "../hook/OwnerOf";
+import { fetcher } from "../utils/fetcher";
 
 export default function Home() {
-  const { send } = useMintNFT();
   const [score, setScore] = useState<number>(0);
   const {
     unityProvider,
@@ -24,22 +26,23 @@ export default function Home() {
     },
   });
   const [devicePixelRatio, setDevicePixelRatio] = useState(0);
-  const [open, setOpen] = useState<boolean>(false);
+  const [colorOpen, setColorOpen] = useState<boolean>(false);
+  const [scoreOpen, setScoreOpen] = useState<boolean>(false);
+  const { url } = useColor();
+  const { owner } = useOwnerOf();
+  const { data, error } = useSWR(url, fetcher);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setDevicePixelRatio(window.devicePixelRatio);
     }
   }, []);
-  const handleSubmit = async () => {
-    await send("3rd", "10,000", "2022/11/21");
-  };
   const handleColor = useCallback((rgb: string) => {
     sendMessage("Color", "ChangeColor", rgb);
   }, []);
   const handleGameOver = useCallback((score: number) => {
     setScore(score);
-    setOpen(true);
+    setScoreOpen(true);
   }, []);
   useEffect(() => {
     addEventListener("Score", handleGameOver);
@@ -47,6 +50,7 @@ export default function Home() {
       removeEventListener("Score", handleGameOver);
     };
   }, [handleGameOver, addEventListener, removeEventListener]);
+
   return (
     <div>
       <Head>
@@ -59,8 +63,30 @@ export default function Home() {
           <h1 className="text-transparent font-extrabold text-2xl bg-clip-text bg-gradient-to-r from-[#4158D0] via-[#C850C0] to-[#FFCC70]">
             Many drops make a shower
           </h1>
-          <button onClick={() => handleColor("#000000")}>Color</button>
-          <WalletConnect />
+          <div className="flex items-center">
+            <WalletConnect />
+            <button className="ml-10" onClick={() => setColorOpen(true)}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
       <main className="w-full relative">
@@ -88,18 +114,39 @@ export default function Home() {
           devicePixelRatio={devicePixelRatio}
         />
         <Modal
-          opened={open}
-          onClose={() => setOpen(false)}
-          title="Introduce yourself!"
+          opened={colorOpen}
+          onClose={() => setColorOpen(false)}
+          centered
+          withCloseButton={false}
         >
-          <p className="text-3xl font-bold text-center ">{score}</p>
+          <h3 className="text-xl font-bold">Colors you have</h3>
+          <ul className="pt-10">
+            {owner ? (
+              <li className="flex justify-between">
+                <span
+                  className="block py-2 px-4 rounded-full text-center w-[70%]"
+                  style={{ backgroundColor: data?.name }}
+                >
+                  {data?.name}
+                </span>
+                <button className="text-sm leading-none cursor-pointer font-bold text-white bg-black py-4 px-5 ml-10 rounded-md">
+                  選択
+                </button>
+              </li>
+            ) : (
+              <li>NFTを所持していません</li>
+            )}
+          </ul>
         </Modal>
-        <button
-          className="w-20 h-20 rounded-full bg-black absolute right-4 bottom-4"
-          onClick={() => setOpen(true)}
+        <Modal
+          opened={scoreOpen}
+          onClose={() => setScoreOpen(false)}
+          centered
+          withCloseButton={false}
         >
-          色変更
-        </button>
+          <h3 className="text-xl font-bold">Your score</h3>
+          <p className="text-3xl font-bold text-center pt-10">{score}</p>
+        </Modal>
       </main>
     </div>
   );
