@@ -4,9 +4,21 @@ import { useCallback, useEffect, useState } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { WalletConnect } from "../component/WalletConnect";
 import { useMintNFT } from "../hook/MintNFT";
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { firebaseAuth } from "../Firebase/firebase";
 
 export default function Home() {
   const { send } = useMintNFT();
+  
+  const [user, setUser] = useState<User | null>();
+
+  /* ↓ログインしているかどうかを判定する */
+  useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
+
   const [score, setScore] = useState<number>(0);
   const {
     unityProvider,
@@ -34,9 +46,10 @@ export default function Home() {
   const handleSubmit = async () => {
     await send("3rd", "10,000", "2022/11/21");
   };
-  const handleColor = useCallback((rgb: string) => {
+  const handleColor = (rgb: string) => {
     sendMessage("Color", "ChangeColor", rgb);
-  }, []);
+  };
+
   const handleGameOver = useCallback((score: number) => {
     setScore(score);
     setOpen(true);
@@ -61,6 +74,7 @@ export default function Home() {
           </h1>
           <button onClick={() => handleColor("#000000")}>Color</button>
           <WalletConnect />
+          <div>{user? user.displayName : ""}</div>
         </div>
       </header>
       <main className="w-full relative">
