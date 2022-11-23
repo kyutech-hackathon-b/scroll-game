@@ -1,0 +1,1 @@
+export { useOwnerOf } from "./OwnerOf";
